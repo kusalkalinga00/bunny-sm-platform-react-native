@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: widthPercentage(4),
   },
-
   welcomeImage: {
     height: heightPercentage(30),
     width: widthPercentage(100),

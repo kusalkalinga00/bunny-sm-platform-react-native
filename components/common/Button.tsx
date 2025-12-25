@@ -12,8 +12,8 @@ const Button = ({
   loading = false,
   hasShadow = true,
 }: {
-  buttonStyle: object;
-  textStyle: object;
+  buttonStyle?: object;
+  textStyle?: object;
   title: string;
   onPress: () => void;
   loading: boolean;
