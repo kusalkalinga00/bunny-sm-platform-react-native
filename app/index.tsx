@@ -1,4 +1,4 @@
-import ScreenWrapper from "@/components/ScreenWrapper";
+import ScreenWrapper from "@/components/common/ScreenWrapper";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Button, Text } from "react-native";

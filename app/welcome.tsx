@@ -1,5 +1,5 @@
-import Button from "@/components/Button";
-import ScreenWrapper from "@/components/ScreenWrapper";
+import Button from "@/components/common/Button";
+import ScreenWrapper from "@/components/common/ScreenWrapper";
 import { theme } from "@/constants/theme";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
 import { useRouter } from "expo-router";

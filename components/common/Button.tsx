@@ -1,4 +1,4 @@
-import Loading from "@/components/Loading";
+import Loading from "@/components/common/Loading";
 import { theme } from "@/constants/theme";
 import { heightPercentage } from "@/helpers/common";
 import React from "react";
