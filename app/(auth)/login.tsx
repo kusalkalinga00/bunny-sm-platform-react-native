@@ -5,6 +5,7 @@ import Input from "@/components/common/Input";
 import ScreenWrapper from "@/components/common/ScreenWrapper";
 import { theme } from "@/constants/theme";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useRef, useState } from "react";
@@ -21,6 +22,26 @@ const login = () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert("Login", "Please fill all the fields");
       return;
+    }
+
+    setLoading(true);
+
+    let email = emailRef.current.trim();
+    let password = passwordRef.current.trim();
+
+    setLoading(true);
+
+    const { error, data: session } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    console.log("error:", error);
+
+    setLoading(false);
+
+    if (error) {
+      Alert.alert("Login", error.message);
     }
   };
 
