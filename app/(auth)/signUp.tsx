@@ -37,6 +37,7 @@ const signUp = () => {
       options: {
         data: {
           name,
+          email,
         },
       },
     });
