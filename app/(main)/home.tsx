@@ -1,28 +1,129 @@
+import Icon from "@/assets/icons";
+import Avatar from "@/components/common/Avatar";
 import ScreenWrapper from "@/components/common/ScreenWrapper";
+import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
-import { supabase } from "@/lib/supabase";
+import { heightPercentage, widthPercentage } from "@/helpers/common";
+import { useRouter } from "expo-router";
 import React from "react";
-import { Alert, Button, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const Home = () => {
-  const { setAuth } = useAuth();
+  const { setAuth, user } = useAuth();
+  const router = useRouter();
 
-  const onLogOut = async () => {
-    setAuth(null);
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      Alert.alert("Logout Error", error.message);
-    }
-  };
+  console.log("User in Home:", user);
+
+  // const onLogOut = async () => {
+  //   setAuth(null);
+  //   const { error } = await supabase.auth.signOut();
+  //   if (error) {
+  //     Alert.alert("Logout Error", error.message);
+  //   }
+  // };
 
   return (
     <ScreenWrapper bg="#fff">
-      <Text>home</Text>
-      <Button title="log out" onPress={onLogOut} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>BunnyUp</Text>
+          <View style={styles.icons}>
+            <Pressable onPress={() => router.push("/(main)/notifications")}>
+              <Icon
+                name="heart"
+                size={heightPercentage(3.2)}
+                color={theme.colors.text}
+                strokeWidth={2}
+              />
+            </Pressable>
+
+            <Pressable onPress={() => router.push("/(main)/new-post")}>
+              <Icon
+                name="plus"
+                size={heightPercentage(3.2)}
+                color={theme.colors.text}
+                strokeWidth={2}
+              />
+            </Pressable>
+
+            <Pressable onPress={() => router.push("/(main)/profile")}>
+              {/* <Icon
+                name="user"
+                size={heightPercentage(3.2)}
+                color={theme.colors.text}
+                strokeWidth={2}
+              /> */}
+              <Avatar
+                uri={user?.image}
+                size={heightPercentage(4.3)}
+                rounded={theme.radius.sm}
+                style={{
+                  borderWidth: 2,
+                }}
+              />
+            </Pressable>
+          </View>
+        </View>
+      </View>
     </ScreenWrapper>
   );
 };
 
 export default Home;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    marginHorizontal: widthPercentage(4),
+  },
+  title: {
+    color: theme.colors.text,
+    fontSize: heightPercentage(3.2),
+    fontWeight: theme.fonts.bold,
+  },
+  avatarImage: {
+    height: heightPercentage(4.3),
+    width: heightPercentage(4.3),
+    borderRadius: theme.radius.sm,
+    borderCurve: "continuous",
+    borderColor: theme.colors.gray,
+    borderWidth: 3,
+  },
+  icons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+  },
+  listStyle: {
+    paddingTop: 20,
+    paddingHorizontal: widthPercentage(4),
+  },
+  noPosts: {
+    fontSize: heightPercentage(2),
+    textAlign: "center",
+    color: theme.colors.text,
+  },
+  pill: {
+    position: "absolute",
+    right: -10,
+    top: -5,
+    height: heightPercentage(2.2),
+    width: heightPercentage(2.2),
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    backgroundColor: theme.colors.roseLight,
+  },
+  pillText: {
+    color: "#ffffff",
+    fontSize: heightPercentage(1.2),
+    fontWeight: theme.fonts.bold,
+  },
+});

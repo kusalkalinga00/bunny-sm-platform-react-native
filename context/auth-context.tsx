@@ -1,10 +1,14 @@
 import type { User } from "@supabase/supabase-js";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
+export type AppUser = User & {
+  image: string | null;
+};
+
 export type AuthContextValue = {
-  user: User | null;
+  user: AppUser | null;
   setAuth: (authUser: User | null) => void;
-  setUserData: (userData: Partial<User>) => void;
+  setUserData: (userData: Partial<AppUser>) => void;
 };
 
 export const AuthContext = createContext<AuthContextValue>({
@@ -14,14 +18,16 @@ export const AuthContext = createContext<AuthContextValue>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
 
   const setAuth = (authUser: User | null) => {
-    setUser(authUser);
+    setUser(authUser ? ({ ...authUser, image: null } as AppUser) : null);
   };
 
-  const setUserData = (userData: Partial<User>) => {
-    setUser((prev) => (prev ? { ...prev, ...userData } : (userData as User)));
+  const setUserData = (userData: Partial<AppUser>) => {
+    setUser((prev) =>
+      prev ? { ...prev, ...userData } : (userData as AppUser)
+    );
   };
 
   return (
