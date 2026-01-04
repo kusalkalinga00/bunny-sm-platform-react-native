@@ -12,6 +12,8 @@ const Home = () => {
   const { setAuth, user } = useAuth();
   const router = useRouter();
 
+  console.log("User in Home:", user);
+
   // const onLogOut = async () => {
   //   setAuth(null);
   //   const { error } = await supabase.auth.signOut();
@@ -51,7 +53,14 @@ const Home = () => {
                 color={theme.colors.text}
                 strokeWidth={2}
               /> */}
-              <Avatar />
+              <Avatar
+                uri={user?.image}
+                size={heightPercentage(4.3)}
+                rounded={theme.radius.sm}
+                style={{
+                  borderWidth: 2,
+                }}
+              />
             </Pressable>
           </View>
         </View>
