@@ -29,3 +29,32 @@ export const getUserData = async (userId: string) => {
     };
   }
 };
+
+export const updateUserData = async (userId: string, data: any) => {
+  try {
+    const { error } = await supabase
+      .from("users")
+      .update(data)
+      .eq("id", userId);
+
+    if (error) {
+      return {
+        success: false,
+        msg: error.message,
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      msg: "User data updated successfully",
+      data,
+    };
+  } catch (error: any) {
+    console.log("Error updating user data: ", error);
+    return {
+      success: false,
+      msg: error.message,
+    };
+  }
+};

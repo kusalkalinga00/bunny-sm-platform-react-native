@@ -3,9 +3,10 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 export type AppUser = User & {
   image: string | null;
-  address : string | null;
-  name : string | null;
-  bio : string | null;
+  address: string | null;
+  name: string | null;
+  bio: string | null;
+  phoneNumber: string | null;
 };
 
 export type AuthContextValue = {
