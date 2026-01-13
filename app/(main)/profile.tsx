@@ -111,10 +111,10 @@ const UserHeader = ({
                 <Icon name="mail" size={18} color={theme.colors.textLight} />
                 <Text style={styles.infoText}>{user && user.email}</Text>
               </View>
-              {user && user.phone && (
+              {user && user.phoneNumber && (
                 <View style={styles.info}>
                   <Icon name="call" size={18} color={theme.colors.textLight} />
-                  <Text style={styles.infoText}>{user && user.phone}</Text>
+                  <Text style={styles.infoText}>{user && user.phoneNumber}</Text>
                 </View>
               )}
               {user && user.bio && (

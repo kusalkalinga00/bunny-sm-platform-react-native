@@ -8,7 +8,9 @@ import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
 import { getUserImageUrl } from "@/services/image-services";
 import { updateUserData } from "@/services/user-services";
+import { Profile } from "@/types";
 import { Image } from "expo-image";
+// import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -21,7 +23,7 @@ import {
 
 const editProfile = () => {
   const { user: currentUser, setUserData } = useAuth();
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<Partial<Profile>>({
     name: "",
     phoneNumber: "",
     image: null as string | null,
@@ -46,14 +48,25 @@ const editProfile = () => {
     setLoading(false);
 
     if (response.success) {
-      setUserData({ ...currentUser, ...userData });
+      setUserData({ ...currentUser, ...response.data });
       Alert.alert("Profile", "Profile updated successfully.");
     } else {
       Alert.alert("Profile", response.msg || "Failed to update profile.");
     }
   };
 
-  const onPickImage = async () => {};
+  const onPickImage = async () => {
+    // let result = await ImagePicker.launchImageLibraryAsync({
+    //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //   allowsEditing: true,
+    //   aspect: [4, 3],
+    //   quality: 1,
+    // });
+
+    // if (!result.canceled) {
+    //   setUser({ ...user, image: result.assets[0].uri });
+    // }
+  };
 
   useEffect(() => {
     if (currentUser) {

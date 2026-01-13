@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { Profile } from "@/types";
 
 export const getUserData = async (userId: string) => {
   try {
@@ -30,12 +31,17 @@ export const getUserData = async (userId: string) => {
   }
 };
 
-export const updateUserData = async (userId: string, data: any) => {
+export const updateUserData = async (
+  userId: string,
+  data: Partial<Profile>
+) => {
   try {
-    const { error } = await supabase
+    const { data: userData, error } = await supabase
       .from("users")
       .update(data)
-      .eq("id", userId);
+      .eq("id", userId)
+      .select()
+      .single();
 
     if (error) {
       return {
@@ -48,7 +54,7 @@ export const updateUserData = async (userId: string, data: any) => {
     return {
       success: true,
       msg: "User data updated successfully",
-      data,
+      data: userData,
     };
   } catch (error: any) {
     console.log("Error updating user data: ", error);
