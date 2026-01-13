@@ -6,7 +6,7 @@ import { StyleSheet, TextInput, View } from "react-native";
 const Input = (props: any) => {
   return (
     <View
-      style={[styles.container, props.ContainerStyles && props.ContainerStyles]}
+      style={[styles.container, props.containerStyle && props.containerStyle]}
     >
       {props.icon && props.icon}
       <TextInput

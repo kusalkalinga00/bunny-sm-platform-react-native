@@ -1,12 +1,8 @@
+import { Profile } from "@/types";
 import type { User } from "@supabase/supabase-js";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-export type AppUser = User & {
-  image: string | null;
-  address : string | null;
-  name : string | null;
-  bio : string | null;
-};
+export type AppUser = User & Profile;
 
 export type AuthContextValue = {
   user: AppUser | null;
