@@ -6,11 +6,11 @@ import ScreenWrapper from "@/components/common/ScreenWrapper";
 import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
-import { getUserImageUrl } from "@/services/image-services";
+import { getUserImageUrl, uploadFile } from "@/services/image-services";
 import { updateUserData } from "@/services/user-services";
 import { Profile } from "@/types";
 import { Image } from "expo-image";
-// import * as ImagePicker from "expo-image-picker";
+import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -32,9 +32,12 @@ const editProfile = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  const [localImage, setLocalImage] =
+    useState<ImagePicker.ImagePickerAsset | null>(null);
+
   const onSubmit = async () => {
-    let userData = { ...user };
-    let { name, phoneNumber, address, image, bio } = userData;
+    let userData: Partial<Profile> = { ...user };
+    let { name, phoneNumber, address } = userData;
 
     if (!name || !phoneNumber || !address) {
       Alert.alert("Profile", "Please fill all the required fields.");
@@ -42,6 +45,20 @@ const editProfile = () => {
     }
 
     setLoading(true);
+
+    if (localImage) {
+      // upload image
+      let imageResponse = await uploadFile(
+        "profiles",
+        localImage.uri,
+        true,
+        localImage.fileName || "profile.jpg"
+      );
+
+      if (imageResponse.success) {
+        userData.image = imageResponse.data as string;
+      }
+    }
 
     // update user
     const response = await updateUserData(currentUser?.id!, userData);
@@ -56,22 +73,20 @@ const editProfile = () => {
   };
 
   const onPickImage = async () => {
-    // let result = await ImagePicker.launchImageLibraryAsync({
-    //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    //   allowsEditing: true,
-    //   aspect: [4, 3],
-    //   quality: 1,
-    // });
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    });
 
-    // if (!result.canceled) {
-    //   setUser({ ...user, image: result.assets[0].uri });
-    // }
+    if (!result.canceled) {
+      setLocalImage(result.assets[0]);
+    }
   };
 
   useEffect(() => {
     if (currentUser) {
-      console.log("currentUser", currentUser);
-
       setUser({
         name: currentUser.name || "",
         phoneNumber: currentUser.phoneNumber || "",
@@ -82,7 +97,9 @@ const editProfile = () => {
     }
   }, [currentUser]);
 
-  const imageSource = getUserImageUrl(user?.image);
+  const imageSource = localImage
+    ? { uri: localImage.uri }
+    : getUserImageUrl(user?.image);
 
   return (
     <ScreenWrapper bg="#ffffff">
