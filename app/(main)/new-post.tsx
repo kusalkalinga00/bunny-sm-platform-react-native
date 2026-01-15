@@ -63,10 +63,15 @@ const newPost = () => {
       return;
     }
 
-    let data = {
+    if (!user?.id) {
+      Alert.alert("Create Post", "You must be logged in to post.");
+      return;
+    }
+
+    const data = {
       file,
       body: bodyRef.current,
-      userId: user?.id,
+      userId: user.id,
     };
 
     // create post
@@ -74,6 +79,12 @@ const newPost = () => {
     let res = await createOrUpdatePost(data);
     console.log("create post response", res);
     setLoading(false);
+
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert("Create Post", res.msg);
+    }
   };
 
   return (
