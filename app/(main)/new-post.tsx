@@ -81,6 +81,9 @@ const newPost = () => {
     setLoading(false);
 
     if (res.success) {
+      setFile(null);
+      bodyRef.current = "";
+      editorRef.current.setContentHTML("");
       router.back();
     } else {
       Alert.alert("Create Post", res.msg);
