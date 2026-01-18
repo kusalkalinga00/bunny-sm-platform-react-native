@@ -52,6 +52,8 @@ const PostCard = ({
   };
 
   const createdAt = moment(post.created_at).format("MMM D");
+  const liked = false;
+  const likes = [];
 
   const openPostDetails = () => {};
 
@@ -100,6 +102,32 @@ const PostCard = ({
             contentPosition={"center"}
           />
         )}
+      </View>
+
+      <View style={styles.footer}>
+        <View style={styles.footerButton}>
+          <TouchableOpacity>
+            <Icon
+              name="heart"
+              size={24}
+              color={liked ? theme.colors.rose : theme.colors.text}
+              fill={liked ? theme.colors.rose : "none"}
+            />
+          </TouchableOpacity>
+          <Text style={styles.count}>{likes.length}</Text>
+        </View>
+        <View style={styles.footerButton}>
+          <TouchableOpacity>
+            <Icon name="comment" size={24} color={theme.colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.count}>0</Text>
+        </View>
+        <View style={styles.footerButton}>
+          <TouchableOpacity>
+            <Icon name="share" size={24} color={theme.colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.count}>0</Text>
+        </View>
       </View>
     </View>
   );
