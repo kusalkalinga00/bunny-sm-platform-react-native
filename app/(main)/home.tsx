@@ -82,7 +82,7 @@ const Home = () => {
           contentContainerStyle={styles.listStyle}
           keyExtractor={(items) => items.id.toString()}
           renderItem={({ item }) => (
-            <PostCard post={item} currentUser={user} router={router} />
+            <PostCard post={item} currentUser={user} router={router} hasShadow={true} />
           )}
         />
       </View>
