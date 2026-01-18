@@ -1,26 +1,36 @@
 import Icon from "@/assets/icons";
 import Avatar from "@/components/common/Avatar";
 import ScreenWrapper from "@/components/common/ScreenWrapper";
+import PostCard from "@/components/home/PostCard";
 import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
+import { fetchPosts } from "@/services/posts-services";
+import { Post } from "@/types";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 const Home = () => {
   const { setAuth, user } = useAuth();
   const router = useRouter();
+  const [posts, setPosts] = useState<Post[]>([]);
+  let limit = 0;
 
-  console.log("User in Home:", user);
+  const getPosts = async () => {
+    limit = limit + 10;
 
-  // const onLogOut = async () => {
-  //   setAuth(null);
-  //   const { error } = await supabase.auth.signOut();
-  //   if (error) {
-  //     Alert.alert("Logout Error", error.message);
-  //   }
-  // };
+    console.log("Fetching posts with limit:", limit);
+
+    let res = await fetchPosts(limit);
+    if (res.success && res.data) {
+      setPosts(res.data);
+    }
+  };
+
+  useEffect(() => {
+    getPosts();
+  }, []);
 
   return (
     <ScreenWrapper bg="#fff">
@@ -64,6 +74,17 @@ const Home = () => {
             </Pressable>
           </View>
         </View>
+
+        {/* posts */}
+        <FlatList
+          data={posts}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listStyle}
+          keyExtractor={(items) => items.id.toString()}
+          renderItem={({ item }) => (
+            <PostCard post={item} currentUser={user} router={router} />
+          )}
+        />
       </View>
     </ScreenWrapper>
   );
