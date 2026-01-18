@@ -90,11 +90,11 @@ const Home = () => {
               hasShadow={true}
             />
           )}
-          ListFooterComponent={
-            <View style={{ marginVertical: 30 }}>
-              <Loading />
-            </View>
-          }
+          // ListFooterComponent={
+          //   <View style={{ marginVertical: 30 }}>
+          //     <Loading />
+          //   </View>
+          // }
         />
       </View>
     </ScreenWrapper>
