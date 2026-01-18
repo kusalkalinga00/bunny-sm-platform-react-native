@@ -1,3 +1,5 @@
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+
 export type Profile = {
   name: string | null;
   phoneNumber: string | null;
@@ -39,3 +41,13 @@ export type PostRecord = {
   user_id?: string;
   file?: string | null;
 };
+
+export type PostRow = {
+  body: string;
+  created_at: string;
+  file: string | null;
+  id: number;
+  userId: string;
+};
+
+export type PostsRealtimePayload = RealtimePostgresChangesPayload<PostRow>;

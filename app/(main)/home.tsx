@@ -1,13 +1,15 @@
 import Icon from "@/assets/icons";
 import Avatar from "@/components/common/Avatar";
-import Loading from "@/components/common/Loading";
 import ScreenWrapper from "@/components/common/ScreenWrapper";
 import PostCard from "@/components/home/PostCard";
 import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
+import { supabase } from "@/lib/supabase";
 import { fetchPosts } from "@/services/posts-services";
-import { Post } from "@/types";
+import { getUserData } from "@/services/user-services";
+import { Post, PostsRealtimePayload } from "@/types";
+
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
@@ -29,8 +31,46 @@ const Home = () => {
     }
   };
 
+  const handlePostsEvent = async (payload: PostsRealtimePayload) => {
+    if (payload.eventType === "INSERT" && payload.new.id) {
+      let newPost = { ...payload.new };
+
+      let userRes = await getUserData(payload.new.userId);
+
+      if (userRes.success && userRes.data) {
+        let post: Post = {
+          body: newPost.body,
+          created_at: newPost.created_at,
+          file: newPost.file,
+          id: newPost.id,
+          userId: newPost.userId,
+          user: {
+            id: userRes.data.id,
+            image: userRes.data.image || "",
+            name: userRes.data.name || "Unknown",
+          },
+        };
+
+        setPosts((prevPosts) => [post, ...prevPosts]);
+      }
+    }
+  };
+
   useEffect(() => {
+    let postChannel = supabase
+      .channel("posts")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts" },
+        handlePostsEvent,
+      )
+      .subscribe();
+
     getPosts();
+
+    return () => {
+      supabase.removeChannel(postChannel);
+    };
   }, []);
 
   return (
