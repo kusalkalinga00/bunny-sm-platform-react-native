@@ -1,5 +1,6 @@
 import Icon from "@/assets/icons";
 import Avatar from "@/components/common/Avatar";
+import Loading from "@/components/common/Loading";
 import ScreenWrapper from "@/components/common/ScreenWrapper";
 import PostCard from "@/components/home/PostCard";
 import { theme } from "@/constants/theme";
@@ -82,8 +83,18 @@ const Home = () => {
           contentContainerStyle={styles.listStyle}
           keyExtractor={(items) => items.id.toString()}
           renderItem={({ item }) => (
-            <PostCard post={item} currentUser={user} router={router} hasShadow={true} />
+            <PostCard
+              post={item}
+              currentUser={user}
+              router={router}
+              hasShadow={true}
+            />
           )}
+          ListFooterComponent={
+            <View style={{ marginVertical: 30 }}>
+              <Loading />
+            </View>
+          }
         />
       </View>
     </ScreenWrapper>
