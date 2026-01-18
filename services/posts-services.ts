@@ -1,26 +1,11 @@
 import { supabase } from "@/lib/supabase";
+import {
+  CreateOrUpdatePostInput,
+  Post,
+  PostRecord,
+  ServiceResult,
+} from "@/types";
 import { uploadFile } from "./image-services";
-
-export type ServiceResult<T> =
-  | { success: true; data: T; msg?: string }
-  | { success: false; msg: string; data?: null };
-
-export type FileLike = { uri: string };
-
-export type CreateOrUpdatePostInput = {
-  id?: string;
-  body: string;
-  userId: string;
-  file?: FileLike | string | null;
-};
-
-type PostRecord = {
-  id?: string;
-  body: string;
-  userId?: string;
-  user_id?: string;
-  file?: string | null;
-};
 
 const getMissingColumnName = (error: any): string | null => {
   const message: unknown = error?.message;
@@ -30,7 +15,7 @@ const getMissingColumnName = (error: any): string | null => {
 };
 
 export const createOrUpdatePost = async (
-  input: CreateOrUpdatePostInput
+  input: CreateOrUpdatePostInput,
 ): Promise<ServiceResult<unknown>> => {
   try {
     let uploadedFileUrl: string | null | undefined = undefined;
@@ -89,6 +74,37 @@ export const createOrUpdatePost = async (
     return {
       success: false,
       msg: "An error occurred while creating the post.",
+    };
+  }
+};
+
+export const fetchPosts = async (
+  limit = 10,
+): Promise<ServiceResult<Post[]>> => {
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select(
+        ` *,
+        user: users (id, name, image)`,
+      )
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.log("fetch posts error", error);
+      return {
+        success: false,
+        msg: error.message || "Failed to fetch posts.",
+      };
+    }
+
+    return { success: true, data: data || [] };
+  } catch (error) {
+    console.log("fetch posts error", error);
+    return {
+      success: false,
+      msg: "An error occurred while fetching the posts.",
     };
   }
 };
