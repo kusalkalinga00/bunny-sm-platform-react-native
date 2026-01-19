@@ -1,5 +1,6 @@
 import Icon from "@/assets/icons";
 import Avatar from "@/components/common/Avatar";
+import Loading from "@/components/common/Loading";
 import ScreenWrapper from "@/components/common/ScreenWrapper";
 import PostCard from "@/components/home/PostCard";
 import { theme } from "@/constants/theme";
@@ -15,19 +16,22 @@ import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 const Home = () => {
-  const { setAuth, user } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
-  let limit = 0;
+  const [limit, setLimit] = useState(10);
+  const [hasMore, setHasMore] = useState(true);
 
   const getPosts = async () => {
-    limit = limit + 10;
-
-    console.log("Fetching posts with limit:", limit);
+    if (!hasMore) return null;
 
     let res = await fetchPosts(limit);
     if (res.success && res.data) {
+      if (posts.length === res.data.length) {
+        setHasMore(false);
+      }
       setPosts(res.data);
+      setLimit(limit + 4);
     }
   };
 
@@ -65,8 +69,6 @@ const Home = () => {
         handlePostsEvent,
       )
       .subscribe();
-
-    getPosts();
 
     return () => {
       supabase.removeChannel(postChannel);
@@ -130,11 +132,22 @@ const Home = () => {
               hasShadow={true}
             />
           )}
-          // ListFooterComponent={
-          //   <View style={{ marginVertical: 30 }}>
-          //     <Loading />
-          //   </View>
-          // }
+          ListFooterComponent={
+            hasMore ? (
+              <View style={{ marginVertical: 30 }}>
+                <Loading />
+              </View>
+            ) : (
+              <View style={{ marginVertical: 30 }}>
+                <Text style={styles.noPosts}>No more posts to display.</Text>
+              </View>
+            )
+          }
+          onEndReached={() => {
+            getPosts();
+            console.log("End reached, fetching more posts...");
+          }}
+          onEndReachedThreshold={0}
         />
       </View>
     </ScreenWrapper>
