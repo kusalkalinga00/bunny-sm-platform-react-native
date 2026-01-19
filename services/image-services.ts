@@ -16,7 +16,7 @@ export const uploadFile = async (
   folderName: string,
   fileUri: string,
   isImage = true as boolean,
-  fileName?: string
+  fileName?: string,
 ) => {
   try {
     let filePath = getFilePath(folderName, isImage, fileName);
@@ -65,11 +65,26 @@ export const uploadFile = async (
 export const getFilePath = (
   folderName: string,
   isImage: boolean,
-  fileName?: string
+  fileName?: string,
 ) => {
   if (fileName) {
     const ext = fileName.split(".").pop();
     return `${folderName}/${Date.now()}.${ext}`;
   }
   return `/${folderName}/${Date.now()}${isImage ? ".jpg" : ".mp4"}`;
+};
+
+export const getLocalFileUri = (filePath: string) => {
+  let fileName = filePath.split("/").pop();
+  return `${FileSystem.documentDirectory}${fileName}`;
+};
+
+export const downloadFile = async (url: string) => {
+  try {
+    const { uri } = await FileSystem.downloadAsync(url, getLocalFileUri(url));
+    return uri;
+  } catch (error) {
+    console.log("Error downloading file: ", error);
+    return null;
+  }
 };
