@@ -9,3 +9,7 @@ export const heightPercentage = (percentage: number) => {
 export const widthPercentage = (percentage: number) => {
   return (width * percentage) / 100;
 };
+
+export const stripHTMLTags = (htmlString: string): string => {
+  return htmlString.replace(/<\/?[^>]+(>|$)/g, "");
+};
