@@ -2,12 +2,13 @@ import Icon from "@/assets/icons";
 import { theme } from "@/constants/theme";
 import { AppUser } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
-import { Post } from "@/types";
+import { createPostLike, removePostLike } from "@/services/posts-services";
+import { Likes, Post } from "@/types";
 import { Image } from "expo-image";
 import { Router } from "expo-router";
 import moment from "moment";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import RenderHtml from "react-native-render-html";
 import Avatar from "../common/Avatar";
 
@@ -52,10 +53,46 @@ const PostCard = ({
   };
 
   const createdAt = moment(post.created_at).format("MMM D");
-  const liked = false;
-  const likes = [];
+  const [likes, setLikes] = useState<Likes[]>([]);
+
+  const liked = likes.filter((like) => like.userId === currentUser?.id)[0]
+    ? true
+    : false;
 
   const openPostDetails = () => {};
+
+  const onLike = async () => {
+    if (liked) {
+      // removed the like
+      let response = await removePostLike(post.id, currentUser?.id!);
+
+      if (response.success) {
+        setLikes((prevLikes) =>
+          prevLikes.filter((like) => like.userId !== currentUser?.id),
+        );
+      } else {
+        Alert.alert("Error", response.msg || "Could not unlike the post.");
+      }
+      return;
+    } else {
+      let data = {
+        postId: post.id,
+        userId: currentUser?.id!,
+      };
+
+      let response = await createPostLike(data);
+      if (response.success) {
+        setLikes((prevLikes) => [...prevLikes, response.data]);
+        return;
+      } else {
+        Alert.alert("Error", response.msg || "Could not like the post.");
+      }
+    }
+  };
+
+  useEffect(() => {
+    setLikes(post.postLikes || []);
+  }, [post]);
 
   return (
     <View style={[styles.container, hasShadow && shadowStyles]}>
@@ -106,7 +143,7 @@ const PostCard = ({
 
       <View style={styles.footer}>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onLike}>
             <Icon
               name="heart"
               size={24}
