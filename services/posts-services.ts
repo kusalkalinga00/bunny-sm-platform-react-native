@@ -86,7 +86,8 @@ export const fetchPosts = async (
       .from("posts")
       .select(
         ` *,
-        user: users (id, name, image)`,
+        user: users (id, name, image),
+        postLikes : post_likes (*)`,
       )
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -98,13 +99,70 @@ export const fetchPosts = async (
         msg: error.message || "Failed to fetch posts.",
       };
     }
-
     return { success: true, data: data || [] };
   } catch (error) {
     console.log("fetch posts error", error);
     return {
       success: false,
       msg: "An error occurred while fetching the posts.",
+    };
+  }
+};
+
+export const createPostLike = async (postLike: {
+  postId: number;
+  userId: string;
+}): Promise<ServiceResult<any>> => {
+  try {
+    const { data, error } = await supabase
+      .from("post_likes")
+      .insert(postLike)
+      .select()
+      .single();
+
+    if (error) {
+      console.log("post like error", error);
+      return {
+        success: false,
+        msg: error.message || "Could not like the post.",
+      };
+    }
+
+    return { success: true, data: data || [] };
+  } catch (error) {
+    console.log("post like error", error);
+    return {
+      success: false,
+      msg: "An error occurred while liking the post.",
+    };
+  }
+};
+
+export const removePostLike = async (
+  postId: number,
+  userId: string,
+): Promise<ServiceResult<any>> => {
+  try {
+    const { error, data } = await supabase
+      .from("post_likes")
+      .delete()
+      .eq("userId", userId)
+      .eq("postId", postId);
+
+    if (error) {
+      console.log("post like remove error", error);
+      return {
+        success: false,
+        msg: error.message || "Could not remove the like from the post.",
+      };
+    }
+
+    return { success: true, data: data };
+  } catch (error) {
+    console.log("post like remove error", error);
+    return {
+      success: false,
+      msg: "An error occurred while removing the like from the post.",
     };
   }
 };

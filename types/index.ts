@@ -8,6 +8,13 @@ export type Profile = {
   address: string | null;
 };
 
+export type Likes = {
+  created_at: string;
+  id: number;
+  postId: number;
+  userId: string;
+};
+
 export type Post = {
   body: string;
   created_at: string;
@@ -19,6 +26,7 @@ export type Post = {
     image: string;
     name: string;
   };
+  postLikes?: Likes[];
 };
 
 export type ServiceResult<T> =
