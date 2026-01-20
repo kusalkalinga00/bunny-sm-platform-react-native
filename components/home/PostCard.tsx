@@ -198,7 +198,9 @@ const PostCard = ({
           <TouchableOpacity onPress={openPostDetails}>
             <Icon name="comment" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <Text style={styles.count}>0</Text>
+          <Text style={styles.count}>
+            {post.comments ? post.comments.length : 0}
+          </Text>
         </View>
         <View style={styles.footerButton}>
           {sharingLoading ? (
