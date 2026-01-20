@@ -197,3 +197,33 @@ export const fetchPostDetails = async (
     };
   }
 };
+
+export const createPostComment = async (postComment: {
+  postId: number;
+  userId: string;
+  text: string;
+}): Promise<ServiceResult<any>> => {
+  try {
+    const { data, error } = await supabase
+      .from("comments")
+      .insert(postComment)
+      .select()
+      .single();
+
+    if (error) {
+      console.log("post comment error", error);
+      return {
+        success: false,
+        msg: error.message || "Could not add the comment.",
+      };
+    }
+
+    return { success: true, data: data || [] };
+  } catch (error) {
+    console.log("post comment error", error);
+    return {
+      success: false,
+      msg: "An error occurred while adding the comment.",
+    };
+  }
+};
