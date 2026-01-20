@@ -87,7 +87,9 @@ export const fetchPosts = async (
       .select(
         ` *,
         user: users (id, name, image),
-        postLikes : post_likes (*)`,
+        postLikes : post_likes (*),
+        comments (*, user : users(id, name, image))
+        `,
       )
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -176,10 +178,15 @@ export const fetchPostDetails = async (
       .select(
         ` *,
         user: users (id, name, image),
-        postLikes : post_likes (*)`,
+        postLikes : post_likes (*),
+        comments (*, user : users(id, name, image))
+        `,
       )
       .eq("id", postId)
+      .order("created_at", { ascending: false, referencedTable: "comments" })
       .single();
+
+    console.log("fetchPostDetails data", data);
 
     if (error) {
       console.log("fetch post error", error);

@@ -15,6 +15,23 @@ export type Likes = {
   userId: string;
 };
 
+export type Comment = {
+  created_at: string;
+  id: number;
+  postId: number;
+  text: string;
+  user: {
+    id: string;
+    image: string;
+    name: string;
+  };
+  userId: string;
+};
+
+export type Comments = {
+  comments: Comment[];
+};
+
 export type Post = {
   body: string;
   created_at: string;
@@ -27,6 +44,7 @@ export type Post = {
     name: string;
   };
   postLikes?: Likes[];
+  comments?: Comment[];
 };
 
 export type ServiceResult<T> =
