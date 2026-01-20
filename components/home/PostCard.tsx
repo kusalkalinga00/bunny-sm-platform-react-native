@@ -30,6 +30,7 @@ interface PostCardProps {
   currentUser: AppUser | null;
   router: Router;
   hasShadow: boolean;
+  showMoreIcon: boolean;
 }
 
 const textStyles = {
@@ -54,6 +55,7 @@ const PostCard = ({
   currentUser,
   router,
   hasShadow = true,
+  showMoreIcon = true,
 }: PostCardProps) => {
   const shadowStyles = {
     shadowOffset: {
@@ -74,6 +76,7 @@ const PostCard = ({
     : false;
 
   const openPostDetails = () => {
+    if (showMoreIcon === false) return;
     router.push({
       pathname: "/post-details",
       params: { postId: post.id },
@@ -146,14 +149,16 @@ const PostCard = ({
           </View>
         </View>
 
-        <TouchableOpacity onPress={openPostDetails}>
-          <Icon
-            name="threeDotsHorizontal"
-            size={heightPercentage(3.4)}
-            strokeWidth={3}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
+        {showMoreIcon && (
+          <TouchableOpacity onPress={openPostDetails}>
+            <Icon
+              name="threeDotsHorizontal"
+              size={heightPercentage(3.4)}
+              strokeWidth={3}
+              color={theme.colors.text}
+            />
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.content}>
         <View style={styles.postBody}>

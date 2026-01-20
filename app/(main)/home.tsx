@@ -130,6 +130,7 @@ const Home = () => {
               currentUser={user}
               router={router}
               hasShadow={true}
+              showMoreIcon={true}
             />
           )}
           ListFooterComponent={
