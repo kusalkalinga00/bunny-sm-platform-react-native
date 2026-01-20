@@ -166,3 +166,34 @@ export const removePostLike = async (
     };
   }
 };
+
+export const fetchPostDetails = async (
+  postId: number,
+): Promise<ServiceResult<Post>> => {
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select(
+        ` *,
+        user: users (id, name, image),
+        postLikes : post_likes (*)`,
+      )
+      .eq("id", postId)
+      .single();
+
+    if (error) {
+      console.log("fetch post error", error);
+      return {
+        success: false,
+        msg: error.message || "Failed to fetch post.",
+      };
+    }
+    return { success: true, data: data || [] };
+  } catch (error) {
+    console.log("fetch post error", error);
+    return {
+      success: false,
+      msg: "An error occurred while fetching the post.",
+    };
+  }
+};

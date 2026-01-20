@@ -30,6 +30,7 @@ interface PostCardProps {
   currentUser: AppUser | null;
   router: Router;
   hasShadow: boolean;
+  showMoreIcon: boolean;
 }
 
 const textStyles = {
@@ -54,6 +55,7 @@ const PostCard = ({
   currentUser,
   router,
   hasShadow = true,
+  showMoreIcon = true,
 }: PostCardProps) => {
   const shadowStyles = {
     shadowOffset: {
@@ -73,7 +75,13 @@ const PostCard = ({
     ? true
     : false;
 
-  const openPostDetails = () => {};
+  const openPostDetails = () => {
+    if (showMoreIcon === false) return;
+    router.push({
+      pathname: "/post-details",
+      params: { postId: post.id },
+    });
+  };
 
   const onLike = async () => {
     if (liked) {
@@ -141,14 +149,16 @@ const PostCard = ({
           </View>
         </View>
 
-        <TouchableOpacity onPress={openPostDetails}>
-          <Icon
-            name="threeDotsHorizontal"
-            size={heightPercentage(3.4)}
-            strokeWidth={3}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
+        {showMoreIcon && (
+          <TouchableOpacity onPress={openPostDetails}>
+            <Icon
+              name="threeDotsHorizontal"
+              size={heightPercentage(3.4)}
+              strokeWidth={3}
+              color={theme.colors.text}
+            />
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.content}>
         <View style={styles.postBody}>
@@ -185,7 +195,7 @@ const PostCard = ({
           <Text style={styles.count}>{likes.length}</Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={openPostDetails}>
             <Icon name="comment" size={24} color={theme.colors.text} />
           </TouchableOpacity>
           <Text style={styles.count}>0</Text>
