@@ -146,7 +146,6 @@ const Home = () => {
           }
           onEndReached={() => {
             getPosts();
-            console.log("End reached, fetching more posts...");
           }}
           onEndReachedThreshold={0}
         />
