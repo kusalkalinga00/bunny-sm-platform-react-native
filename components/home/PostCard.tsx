@@ -1,16 +1,29 @@
 import Icon from "@/assets/icons";
 import { theme } from "@/constants/theme";
 import { AppUser } from "@/context/auth-context";
-import { heightPercentage, widthPercentage } from "@/helpers/common";
+import {
+  heightPercentage,
+  stripHTMLTags,
+  widthPercentage,
+} from "@/helpers/common";
+import { downloadFile } from "@/services/image-services";
 import { createPostLike, removePostLike } from "@/services/posts-services";
 import { Likes, Post } from "@/types";
 import { Image } from "expo-image";
 import { Router } from "expo-router";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Share,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import RenderHtml from "react-native-render-html";
 import Avatar from "../common/Avatar";
+import Loading from "../common/Loading";
 
 interface PostCardProps {
   post: Post;
@@ -54,6 +67,7 @@ const PostCard = ({
 
   const createdAt = moment(post.created_at).format("MMM D");
   const [likes, setLikes] = useState<Likes[]>([]);
+  const [sharingLoading, setSharingLoading] = useState(false);
 
   const liked = likes.filter((like) => like.userId === currentUser?.id)[0]
     ? true
@@ -88,6 +102,23 @@ const PostCard = ({
         Alert.alert("Error", response.msg || "Could not like the post.");
       }
     }
+  };
+
+  const onShare = async () => {
+    const content = {
+      message: stripHTMLTags(post.body) || "Check out this post!",
+      url: post.file || undefined,
+    };
+
+    if (post.file) {
+      setSharingLoading(true);
+      let uri = await downloadFile(post.file);
+      setSharingLoading(false);
+      if (uri) {
+        content.url = uri;
+      }
+    }
+    Share.share(content);
   };
 
   useEffect(() => {
@@ -160,10 +191,13 @@ const PostCard = ({
           <Text style={styles.count}>0</Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
-            <Icon name="share" size={24} color={theme.colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.count}>0</Text>
+          {sharingLoading ? (
+            <Loading size={"small"} />
+          ) : (
+            <TouchableOpacity onPress={onShare}>
+              <Icon name="share" size={24} color={theme.colors.text} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>
