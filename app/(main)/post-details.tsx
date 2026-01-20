@@ -2,6 +2,7 @@ import Icon from "@/assets/icons";
 import Input from "@/components/common/Input";
 import Loading from "@/components/common/Loading";
 import PostCard from "@/components/home/PostCard";
+import CommentItem from "@/components/post-details/Comment";
 import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
@@ -68,6 +69,8 @@ const PostDetails = () => {
     }
   };
 
+  const onDeleteComment = async () => {};
+
   if (startLoading) {
     return (
       <View style={styles.center}>
@@ -129,6 +132,26 @@ const PostDetails = () => {
             <TouchableOpacity style={styles.sendIcon} onPress={addNewComment}>
               <Icon name="send" color={theme.colors.primary} />
             </TouchableOpacity>
+          )}
+        </View>
+
+        {/* comment list */}
+        <View style={{ marginVertical: 15, gap: 17 }}>
+          {post?.comments?.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              canDelete={
+                user?.id === comment.userId || user?.id === post.userId
+              }
+              onDelete={onDeleteComment}
+            />
+          ))}
+
+          {post?.comments?.length === 0 && (
+            <Text style={{ color: theme.colors.text, marginLeft: 5 }}>
+              No comments yet. Be the first to comment!
+            </Text>
           )}
         </View>
       </ScrollView>
