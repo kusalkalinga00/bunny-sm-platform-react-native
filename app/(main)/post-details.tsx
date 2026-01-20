@@ -5,11 +5,18 @@ import PostCard from "@/components/home/PostCard";
 import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
-import { fetchPostDetails } from "@/services/posts-services";
+import { createPostComment, fetchPostDetails } from "@/services/posts-services";
 import { Post } from "@/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const PostDetails = () => {
   const { postId } = useLocalSearchParams();
@@ -19,6 +26,7 @@ const PostDetails = () => {
   const [startLoading, setStartLoading] = useState(true);
   const inputRef = React.useRef<string>(null);
   const commentRef = React.useRef<string>("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getPostDetails();
@@ -29,14 +37,36 @@ const PostDetails = () => {
     // Set the post state
 
     const res = await fetchPostDetails(Number(postId));
-    console.log("Post Details:", res);
     if (res.success) {
       setPost(res.data);
-      setStartLoading(false);
     }
+    setStartLoading(false);
   };
 
-  const addNewComment = async () => {};
+  const addNewComment = async () => {
+    if (!commentRef.current) return;
+
+    const data = {
+      userId: user?.id!,
+      postId: Number(postId),
+      text: commentRef.current,
+    };
+
+    setLoading(true);
+    // Call service to add comment
+    const res = await createPostComment(data);
+    setLoading(false);
+    if (res.success) {
+      // send notification to post owner about new comment
+      // Clear input field
+      if (inputRef.current) {
+        inputRef.current = "";
+        commentRef.current = "";
+      }
+    } else {
+      Alert.alert("Error", res.msg || "Could not add the comment.");
+    }
+  };
 
   if (startLoading) {
     return (
@@ -44,6 +74,19 @@ const PostDetails = () => {
         <View style={styles.loading}>
           <Loading size="large" />
         </View>
+      </View>
+    );
+  }
+
+  if (!post) {
+    return (
+      <View
+        style={[
+          styles.center,
+          { justifyContent: "flex-start", marginTop: 100 },
+        ]}
+      >
+        <Text style={styles.notFound}>Post not found.</Text>
       </View>
     );
   }
@@ -78,9 +121,15 @@ const PostDetails = () => {
             onChangeText={(value: string) => (commentRef.current = value)}
           />
 
-          <TouchableOpacity style={styles.sendIcon} onPress={addNewComment}>
-            <Icon name="send" color={theme.colors.primary} />
-          </TouchableOpacity>
+          {loading ? (
+            <View style={styles.loading}>
+              <Loading size="small" />
+            </View>
+          ) : (
+            <TouchableOpacity style={styles.sendIcon} onPress={addNewComment}>
+              <Icon name="send" color={theme.colors.primary} />
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>
