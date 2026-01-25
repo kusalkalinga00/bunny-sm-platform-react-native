@@ -234,3 +234,30 @@ export const createPostComment = async (postComment: {
     };
   }
 };
+
+export const removePostComment = async (
+  commentId: number,
+): Promise<ServiceResult<any>> => {
+  try {
+    const { error, data } = await supabase
+      .from("comments")
+      .delete()
+      .eq("id", commentId);
+
+    if (error) {
+      console.log("post like remove error", error);
+      return {
+        success: false,
+        msg: error.message || "Could not remove the comment from the post.",
+      };
+    }
+
+    return { success: true, data: data };
+  } catch (error) {
+    console.log("post like remove error", error);
+    return {
+      success: false,
+      msg: "An error occurred while removing the comment from the post.",
+    };
+  }
+};
