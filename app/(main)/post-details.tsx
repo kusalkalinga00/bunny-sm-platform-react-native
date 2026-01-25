@@ -6,11 +6,13 @@ import CommentItem from "@/components/post-details/Comment";
 import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
+import { supabase } from "@/lib/supabase";
 import {
   createPostComment,
   fetchPostDetails,
   removePostComment,
 } from "@/services/posts-services";
+import { getUserData } from "@/services/user-services";
 import { Comment, Post } from "@/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -33,8 +35,46 @@ const PostDetails = () => {
   const commentRef = React.useRef<string>("");
   const [loading, setLoading] = useState(false);
 
+  const handleNewComment = async (payload: any) => {
+    console.log("New comment payload: ", payload.new);
+    if (payload.new) {
+      let newComment = { ...payload.new };
+
+      // Fetch user data for the comment
+      const res = await getUserData(newComment.userId);
+      newComment.user = res.success ? res.data : null;
+
+      // Update post state with the new comment
+      setPost((prevPost) => {
+        if (!prevPost) return prevPost;
+        return {
+          ...prevPost,
+          comments: [newComment, ...(prevPost.comments || [])],
+        };
+      });
+    }
+  };
+
   useEffect(() => {
+    let commentChannel = supabase
+      .channel("comments")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "comments",
+          filter: `postId=eq.${postId}`,
+        },
+        handleNewComment,
+      )
+      .subscribe();
+
     getPostDetails();
+
+    return () => {
+      supabase.removeChannel(commentChannel);
+    };
   }, []);
 
   const getPostDetails = async () => {
