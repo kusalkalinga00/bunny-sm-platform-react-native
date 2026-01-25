@@ -13,7 +13,7 @@ import {
   removePostComment,
 } from "@/services/posts-services";
 import { getUserData } from "@/services/user-services";
-import { Comment, Post } from "@/types";
+import { Comment, CommentRow, CommentsRealtimePayload, Post } from "@/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -35,24 +35,50 @@ const PostDetails = () => {
   const commentRef = React.useRef<string>("");
   const [loading, setLoading] = useState(false);
 
-  const handleNewComment = async (payload: any) => {
+  const handleNewComment = async (payload: CommentsRealtimePayload) => {
     console.log("New comment payload: ", payload.new);
-    if (payload.new) {
-      let newComment = { ...payload.new };
+    if (!payload.new) return;
 
-      // Fetch user data for the comment
-      const res = await getUserData(newComment.userId);
-      newComment.user = res.success ? res.data : null;
-
-      // Update post state with the new comment
-      setPost((prevPost) => {
-        if (!prevPost) return prevPost;
-        return {
-          ...prevPost,
-          comments: [newComment, ...(prevPost.comments || [])],
-        };
-      });
+    const row = payload.new as Partial<CommentRow>;
+    if (
+      row.id == null ||
+      row.postId == null ||
+      row.userId == null ||
+      row.text == null ||
+      row.created_at == null
+    ) {
+      return;
     }
+
+    const safeRow = row as CommentRow;
+
+    // Fetch user data for the comment
+    const res = await getUserData(safeRow.userId);
+    const resolvedUser = res.success
+      ? ({
+          id: res.data?.id,
+          image: res.data?.image,
+          name: res.data?.name,
+        } as Comment["user"])
+      : ({ id: safeRow.userId, image: "", name: "Unknown" } as Comment["user"]);
+
+    const newComment: Comment = {
+      id: safeRow.id,
+      postId: safeRow.postId,
+      userId: safeRow.userId,
+      text: safeRow.text,
+      created_at: safeRow.created_at,
+      user: resolvedUser,
+    };
+
+    // Update post state with the new comment
+    setPost((prevPost) => {
+      if (!prevPost) return prevPost;
+      return {
+        ...prevPost,
+        comments: [newComment, ...(prevPost.comments || [])],
+      };
+    });
   };
 
   useEffect(() => {
