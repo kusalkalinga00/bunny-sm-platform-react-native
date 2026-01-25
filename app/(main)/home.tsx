@@ -9,7 +9,13 @@ import { heightPercentage, widthPercentage } from "@/helpers/common";
 import { supabase } from "@/lib/supabase";
 import { fetchPosts } from "@/services/posts-services";
 import { getUserData } from "@/services/user-services";
-import { Post, PostsRealtimePayload } from "@/types";
+import {
+  Comment,
+  CommentRow,
+  CommentsRealtimePayload,
+  Post,
+  PostsRealtimePayload,
+} from "@/types";
 
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -53,6 +59,8 @@ const Home = () => {
             image: userRes.data.image || "",
             name: userRes.data.name || "Unknown",
           },
+          postLikes: [],
+          comments: [],
         };
 
         setPosts((prevPosts) => [post, ...prevPosts]);
@@ -61,8 +69,8 @@ const Home = () => {
   };
 
   useEffect(() => {
-    let postChannel = supabase
-      .channel("posts")
+    const postChannel = supabase
+      .channel("posts:feed")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "posts" },
@@ -73,6 +81,91 @@ const Home = () => {
     return () => {
       supabase.removeChannel(postChannel);
     };
+  }, []);
+
+  const handleCommentInsert = (payload: CommentsRealtimePayload) => {
+    const row = payload.new as Partial<CommentRow> | null;
+    if (!row || row.id == null || row.postId == null || row.userId == null) {
+      return;
+    }
+
+    const comment: Comment = {
+      id: row.id,
+      postId: row.postId,
+      userId: row.userId,
+      text: typeof row.text === "string" ? row.text : "",
+      created_at:
+        typeof row.created_at === "string"
+          ? row.created_at
+          : new Date().toISOString(),
+      user: {
+        id: row.userId,
+        image: "",
+        name: "Unknown",
+      },
+    };
+
+    setPosts((prevPosts) =>
+      prevPosts.map((post) => {
+        if (post.id !== comment.postId) return post;
+
+        const existing = post.comments || [];
+        if (existing.some((c) => c.id === comment.id)) return post;
+
+        return {
+          ...post,
+          comments: [comment, ...existing],
+        };
+      }),
+    );
+  };
+
+  const handleCommentDelete = (payload: any) => {
+    const deletedId = payload?.old?.id;
+    if (deletedId == null) return;
+
+    setPosts((prevPosts) =>
+      prevPosts.map((post) => {
+        if (!post.comments?.length) return post;
+        if (!post.comments.some((c) => c.id === deletedId)) return post;
+        return {
+          ...post,
+          comments: post.comments.filter((c) => c.id !== deletedId),
+        };
+      }),
+    );
+  };
+
+  useEffect(() => {
+    const postsComment = supabase
+      .channel("comments:feed")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "comments",
+        },
+        handleCommentInsert,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "comments",
+        },
+        handleCommentDelete,
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(postsComment);
+    };
+  }, []);
+
+  useEffect(() => {
+    getPosts();
   }, []);
 
   return (

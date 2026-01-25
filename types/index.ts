@@ -77,3 +77,14 @@ export type PostRow = {
 };
 
 export type PostsRealtimePayload = RealtimePostgresChangesPayload<PostRow>;
+
+export type CommentRow = {
+  created_at: string;
+  id: number;
+  postId: number;
+  text: string;
+  userId: string;
+};
+
+export type CommentsRealtimePayload =
+  RealtimePostgresChangesPayload<CommentRow>;
