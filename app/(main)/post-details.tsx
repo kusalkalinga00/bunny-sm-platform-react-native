@@ -6,8 +6,12 @@ import CommentItem from "@/components/post-details/Comment";
 import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
-import { createPostComment, fetchPostDetails } from "@/services/posts-services";
-import { Post } from "@/types";
+import {
+  createPostComment,
+  fetchPostDetails,
+  removePostComment,
+} from "@/services/posts-services";
+import { Comment, Post } from "@/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -69,7 +73,24 @@ const PostDetails = () => {
     }
   };
 
-  const onDeleteComment = async () => {};
+  const onDeleteComment = async (comment: Comment) => {
+    console.log("deleting comment : ", comment);
+    const res = await removePostComment(comment.id);
+    console.log("remove comment res: ", res);
+
+    if (res.success) {
+      // Refresh post details to reflect deleted comment
+      setPost((prevPost) => {
+        if (!prevPost) return prevPost;
+        return {
+          ...prevPost,
+          comments: prevPost.comments!.filter((c) => c.id !== comment.id),
+        };
+      });
+    } else {
+      Alert.alert("Error", res.msg || "Could not delete the comment.");
+    }
+  };
 
   if (startLoading) {
     return (

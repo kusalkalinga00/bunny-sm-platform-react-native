@@ -10,7 +10,7 @@ import Avatar from "../common/Avatar";
 interface CommentProps {
   comment: Comment;
   canDelete: boolean;
-  onDelete: () => void;
+  onDelete: (comment: Comment) => Promise<void>;
 }
 
 const CommentItem = ({
@@ -32,8 +32,8 @@ const CommentItem = ({
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => {
-          onDelete();
+        onPress: async () => {
+          await onDelete(comment);
         },
       },
     ]);
