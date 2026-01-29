@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 import {
   createPostComment,
   fetchPostDetails,
+  removePost,
   removePostComment,
 } from "@/services/posts-services";
 import { getUserData } from "@/services/user-services";
@@ -158,6 +159,19 @@ const PostDetails = () => {
     }
   };
 
+  const onDeletePost = async (post: Post) => {
+    const res = await removePost(post.id);
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert("Error", res.msg || "Could not delete the post.");
+    }
+  };
+
+  const onEditPost = async (post: Post) => {
+    console.log("editing post : ", post);
+  };
+
   if (startLoading) {
     return (
       <View style={styles.center}>
@@ -194,6 +208,9 @@ const PostDetails = () => {
             router={router}
             hasShadow={false}
             showMoreIcon={false}
+            showDeleteIcon={true}
+            onDelete={onDeletePost}
+            onEdit={onEditPost}
           />
         )}
 

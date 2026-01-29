@@ -66,6 +66,12 @@ const Home = () => {
         setPosts((prevPosts) => [post, ...prevPosts]);
       }
     }
+
+    if (payload.eventType === "DELETE" && payload.old.id) {
+      setPosts((prevPosts) =>
+        prevPosts.filter((post) => post.id !== payload.old.id),
+      );
+    }
   };
 
   useEffect(() => {
@@ -224,6 +230,7 @@ const Home = () => {
               router={router}
               hasShadow={true}
               showMoreIcon={true}
+              showDeleteIcon={false}
             />
           )}
           ListFooterComponent={

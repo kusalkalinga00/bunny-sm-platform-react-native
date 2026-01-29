@@ -261,3 +261,30 @@ export const removePostComment = async (
     };
   }
 };
+
+export const removePost = async (
+  postId: number,
+): Promise<ServiceResult<any>> => {
+  try {
+    const { error, data } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", postId);
+
+    if (error) {
+      console.log("post remove error", error);
+      return {
+        success: false,
+        msg: error.message || "Could not remove the post.",
+      };
+    }
+
+    return { success: true, data: data };
+  } catch (error) {
+    console.log("post remove error", error);
+    return {
+      success: false,
+      msg: "An error occurred while removing the post.",
+    };
+  }
+};
