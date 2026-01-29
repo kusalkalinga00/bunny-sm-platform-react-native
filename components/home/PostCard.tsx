@@ -31,6 +31,9 @@ interface PostCardProps {
   router: Router;
   hasShadow: boolean;
   showMoreIcon: boolean;
+  showDeleteIcon: boolean;
+  onDelete?: (post: Post) => Promise<void>;
+  onEdit?: (post: Post) => Promise<void>;
 }
 
 const textStyles = {
@@ -56,6 +59,9 @@ const PostCard = ({
   router,
   hasShadow = true,
   showMoreIcon = true,
+  showDeleteIcon = false,
+  onDelete,
+  onEdit,
 }: PostCardProps) => {
   const shadowStyles = {
     shadowOffset: {
@@ -129,6 +135,27 @@ const PostCard = ({
     Share.share(content);
   };
 
+  const handlePostDelete = () => {
+    Alert.alert("Confirm", "Are you sure you want to delete this comment?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+        onPress: () => {
+          console.log("modal canceled");
+        },
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          if (onDelete) {
+            await onDelete(post);
+          }
+        },
+      },
+    ]);
+  };
+
   useEffect(() => {
     setLikes(post.postLikes || []);
   }, [post]);
@@ -158,6 +185,27 @@ const PostCard = ({
               color={theme.colors.text}
             />
           </TouchableOpacity>
+        )}
+
+        {showDeleteIcon && currentUser?.id === post.userId && (
+          <View style={styles.actions}>
+            <TouchableOpacity onPress={onEdit ? () => onEdit(post) : undefined}>
+              <Icon
+                name="edit"
+                size={heightPercentage(2.5)}
+                strokeWidth={1.5}
+                color={theme.colors.text}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handlePostDelete}>
+              <Icon
+                name="delete"
+                size={heightPercentage(2.5)}
+                strokeWidth={1.5}
+                color={theme.colors.text}
+              />
+            </TouchableOpacity>
+          </View>
         )}
       </View>
       <View style={styles.content}>
