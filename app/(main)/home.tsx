@@ -72,6 +72,19 @@ const Home = () => {
         prevPosts.filter((post) => post.id !== payload.old.id),
       );
     }
+
+    if (payload.eventType === "UPDATE" && payload.new.id) {
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => {
+          if (post.id !== payload.new.id) return post;
+          return {
+            ...post,
+            body: payload.new.body,
+            file: payload.new.file,
+          };
+        }),
+      );
+    }
   };
 
   useEffect(() => {

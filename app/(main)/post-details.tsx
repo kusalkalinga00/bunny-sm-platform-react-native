@@ -169,7 +169,17 @@ const PostDetails = () => {
   };
 
   const onEditPost = async (post: Post) => {
-    console.log("editing post : ", post);
+    router.back();
+    router.push({
+      pathname: "/(main)/new-post",
+      params: {
+        body: post.body,
+        created_at: post.created_at,
+        file: post.file,
+        id: post.id,
+        userId: post.userId,
+      },
+    });
   };
 
   if (startLoading) {

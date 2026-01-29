@@ -10,9 +10,11 @@ import {
 const TextEditor = ({
   editorRef,
   onChange,
+  initialContentHTML,
 }: {
   editorRef: React.RefObject<any>;
   onChange: (body: string) => void;
+  initialContentHTML: string;
 }) => {
   const onPick = async (isPick: boolean) => {};
 
@@ -56,6 +58,7 @@ const TextEditor = ({
         editorStyle={styles.containerStyle}
         placeholder="Whats on your mind ?"
         onChange={onChange}
+        initialContentHTML={initialContentHTML}
       />
     </View>
   );
