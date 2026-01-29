@@ -10,8 +10,8 @@ import { heightPercentage, widthPercentage } from "@/helpers/common";
 import { createOrUpdatePost } from "@/services/posts-services";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Pressable,
@@ -23,6 +23,7 @@ import {
 } from "react-native";
 
 const newPost = () => {
+  const post = useLocalSearchParams();
   const { user } = useAuth();
   const bodyRef = useRef<string>("");
   const editorRef = useRef<any>(null);
@@ -31,8 +32,24 @@ const newPost = () => {
   const [file, setFile] = useState<
     ImagePicker.ImagePickerAsset | null | string
   >(null);
-  // const [localImage, setLocalImage] =
-  //   useState<ImagePicker.ImagePickerAsset | null>(null);
+
+  useEffect(() => {
+    console.log("edit post data : ", post);
+
+    if (post.body && post.id) {
+      bodyRef.current = post.body as string;
+
+      // Try with a longer delay
+      setTimeout(() => {
+        console.log("Setting content:", post.body);
+        editorRef.current?.setContentHTML(post.body);
+      }, 300);
+    }
+
+    if (post.file) {
+      setFile(post.file as string);
+    }
+  }, [post]);
 
   const onPick = async (isPick: boolean) => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -69,9 +86,10 @@ const newPost = () => {
     }
 
     const data = {
+      ...(post.id ? { id: post.id as string } : {}),
       file,
       body: bodyRef.current,
-      userId: user.id,
+      userId: user.id as string,
     };
 
     // create post
@@ -113,6 +131,7 @@ const newPost = () => {
               onChange={(body) => {
                 bodyRef.current = body;
               }}
+              initialContentHTML={post.body as string}
             />
           </View>
 
@@ -143,7 +162,7 @@ const newPost = () => {
 
         <Button
           buttonStyle={{ height: heightPercentage(6.2) }}
-          title="Post"
+          title={post && post.id ? "Update Post" : "Post"}
           loading={loading}
           hasShadow={false}
           onPress={handleOnSubmit}
