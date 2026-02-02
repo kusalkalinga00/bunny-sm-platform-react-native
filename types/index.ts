@@ -88,3 +88,10 @@ export type CommentRow = {
 
 export type CommentsRealtimePayload =
   RealtimePostgresChangesPayload<CommentRow>;
+
+export type Notification = {
+  senderId: string;
+  receiverId: string;
+  title: string;
+  data: string;
+};
