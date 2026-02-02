@@ -7,6 +7,7 @@ import { theme } from "@/constants/theme";
 import { useAuth } from "@/context/auth-context";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
 import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/services/notification-services";
 import {
   createPostComment,
   fetchPostDetails,
@@ -130,6 +131,17 @@ const PostDetails = () => {
     setLoading(false);
     if (res.success) {
       // send notification to post owner about new comment
+      if (post?.userId && post.userId !== user?.id) {
+        const notification = {
+          senderId: user?.id!,
+          receiverId: post.userId,
+          title: "commented on your post",
+          data: JSON.stringify({ postId: post.id, commentId: res.data.id }),
+        };
+
+        const notificationRes = await createNotification(notification);
+        console.log("notificationRes: ", notificationRes);
+      }
       // Clear input field
       if (inputRef.current) {
         inputRef.current = "";
