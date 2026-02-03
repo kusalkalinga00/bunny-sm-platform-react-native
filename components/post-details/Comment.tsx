@@ -11,12 +11,14 @@ interface CommentProps {
   comment: Comment;
   canDelete: boolean;
   onDelete: (comment: Comment) => Promise<void>;
+  highLight: boolean;
 }
 
 const CommentItem = ({
   comment,
   canDelete = false,
   onDelete,
+  highLight = false,
 }: CommentProps) => {
   const createdAt = moment(comment.created_at).format("MMM d");
 
@@ -42,7 +44,7 @@ const CommentItem = ({
   return (
     <View style={styles.container}>
       <Avatar size={40} uri={comment?.user?.image} />
-      <View style={styles.content}>
+      <View style={[styles.content, highLight ? styles.highlight : {}]}>
         <View
           style={{
             flexDirection: "row",
