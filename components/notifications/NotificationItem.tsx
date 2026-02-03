@@ -27,13 +27,13 @@ const NotificationItem = ({
   return (
     <TouchableOpacity style={styles.container} onPress={OpenPostDetails}>
       <Avatar
-        uri={notification.sender.image || ""}
+        uri={notification.sender!.image || ""}
         size={heightPercentage(5)}
         rounded={20}
       />
 
       <View style={styles.nameTitle}>
-        <Text style={styles.text}>{notification.sender.name}</Text>
+        <Text style={styles.text}>{notification.sender!.name}</Text>
         <Text style={[styles.text, { color: theme.colors.textDark }]}>
           {notification.title}
         </Text>
