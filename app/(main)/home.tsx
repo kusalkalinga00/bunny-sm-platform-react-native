@@ -27,6 +27,7 @@ const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [limit, setLimit] = useState(10);
   const [hasMore, setHasMore] = useState(true);
+  const [notificationCount, setNotificationCount] = useState<number>(0);
 
   const getPosts = async () => {
     if (!hasMore) return null;
@@ -87,6 +88,13 @@ const Home = () => {
     }
   };
 
+  const handleNotificationEvent = async (payload: any) => {
+    console.log("New notification received:", payload);
+    if (payload.eventType === "INSERT" && payload.new.id) {
+      setNotificationCount((prevCount) => prevCount + 1);
+    }
+  };
+
   useEffect(() => {
     const postChannel = supabase
       .channel("posts:feed")
@@ -97,8 +105,23 @@ const Home = () => {
       )
       .subscribe();
 
+    const notificationChannel = supabase
+      .channel("notifications:feed")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `receiverId=eq.${user?.id}`,
+        },
+        handleNotificationEvent,
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(postChannel);
+      supabase.removeChannel(notificationChannel);
     };
   }, []);
 
@@ -193,13 +216,24 @@ const Home = () => {
         <View style={styles.header}>
           <Text style={styles.title}>BunnyUp</Text>
           <View style={styles.icons}>
-            <Pressable onPress={() => router.push("/(main)/notifications")}>
+            <Pressable
+              onPress={() => {
+                setNotificationCount(0);
+                router.push("/(main)/notifications");
+              }}
+            >
               <Icon
                 name="heart"
                 size={heightPercentage(3.2)}
                 color={theme.colors.text}
                 strokeWidth={2}
               />
+
+              {notificationCount > 0 && (
+                <View style={styles.pill}>
+                  <Text style={styles.pillText}>{notificationCount}</Text>
+                </View>
+              )}
             </Pressable>
 
             <Pressable onPress={() => router.push("/(main)/new-post")}>
