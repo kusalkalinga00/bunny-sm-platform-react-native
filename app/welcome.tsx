@@ -2,10 +2,11 @@ import Button from "@/components/common/Button";
 import ScreenWrapper from "@/components/common/ScreenWrapper";
 import { theme } from "@/constants/theme";
 import { heightPercentage, widthPercentage } from "@/helpers/common";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const welcome = () => {
   const router = useRouter();
@@ -14,12 +15,6 @@ const welcome = () => {
     <ScreenWrapper bg="white">
       <StatusBar style="dark" />
       <View style={styles.container}>
-        <Image
-          style={styles.welcomeImage}
-          source={require("../assets/images/welcome.png")}
-          resizeMode="contain"
-        />
-
         <View style={{ gap: 20 }}>
           <Text style={styles.title}>BunnyUp!</Text>
           <Text style={styles.punchline}>
@@ -27,6 +22,11 @@ const welcome = () => {
             life easier.
           </Text>
         </View>
+        <Image
+          style={styles.welcomeImage}
+          source={require("../assets/images/welcome.svg")}
+          contentFit="contain"
+        />
 
         <View style={styles.footer}>
           <Button

@@ -106,19 +106,34 @@ const UserHeader = ({
             </View>
 
             {/* email , phone , bio */}
-            <View style={{ gap: 10 }}>
-              <View style={styles.info}>
-                <Icon name="mail" size={18} color={theme.colors.textLight} />
-                <Text style={styles.infoText}>{user && user.email}</Text>
+            <View style={styles.detailsSection}>
+              <View style={styles.infoCard}>
+                <View style={styles.iconContainer}>
+                  <Icon name="mail" size={20} color={theme.colors.primary} />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Email</Text>
+                  <Text style={styles.infoValue}>{user?.email}</Text>
+                </View>
               </View>
-              {user && user.phoneNumber && (
-                <View style={styles.info}>
-                  <Icon name="call" size={18} color={theme.colors.textLight} />
-                  <Text style={styles.infoText}>{user && user.phoneNumber}</Text>
+
+              {user?.phoneNumber && (
+                <View style={styles.infoCard}>
+                  <View style={styles.iconContainer}>
+                    <Icon name="call" size={20} color={theme.colors.primary} />
+                  </View>
+                  <View style={styles.infoContent}>
+                    <Text style={styles.infoLabel}>Phone</Text>
+                    <Text style={styles.infoValue}>{user.phoneNumber}</Text>
+                  </View>
                 </View>
               )}
-              {user && user.bio && (
-                <Text style={styles.infoText}>{user && user.bio}</Text>
+
+              {user?.bio && (
+                <View style={styles.bioCard}>
+                  <Text style={styles.infoLabel}>Bio</Text>
+                  <Text style={styles.bioText}>{user.bio}</Text>
+                </View>
               )}
             </View>
           </View>
@@ -178,6 +193,68 @@ const styles = StyleSheet.create({
     fontWeight: theme.fonts.medium,
     color: theme.colors.textLight,
   },
+
+  detailsSection: {
+    gap: 12,
+  },
+
+  infoCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f9fafb",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+  infoContent: {
+    flex: 1,
+    gap: 2,
+  },
+
+  infoLabel: {
+    fontSize: heightPercentage(1.4),
+    fontWeight: theme.fonts.semiBold,
+    color: theme.colors.textLight,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+
+  infoValue: {
+    fontSize: heightPercentage(1.8),
+    fontWeight: theme.fonts.medium,
+    color: theme.colors.textDark,
+  },
+
+  bioCard: {
+    backgroundColor: "#f9fafb",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    gap: 8,
+  },
+
+  bioText: {
+    fontSize: heightPercentage(1.7),
+    fontWeight: theme.fonts.medium,
+    color: theme.colors.text,
+    lineHeight: heightPercentage(2.4),
+  },
+
   logoutButton: {
     position: "absolute",
     right: 0,
