@@ -28,7 +28,7 @@ import {
 } from "react-native";
 
 const PostDetails = () => {
-  const { postId } = useLocalSearchParams();
+  const { postId, commentId } = useLocalSearchParams();
   const [post, setPost] = useState<Post | null>(null);
   const { user } = useAuth();
   const router = useRouter();
@@ -271,6 +271,7 @@ const PostDetails = () => {
                 user?.id === comment.userId || user?.id === post.userId
               }
               onDelete={onDeleteComment}
+              highLight={Number(commentId) === comment.id}
             />
           ))}
 
