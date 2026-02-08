@@ -19,7 +19,14 @@ import {
 
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 const Home = () => {
   const { user } = useAuth();
@@ -214,7 +221,14 @@ const Home = () => {
     <ScreenWrapper bg="#fff">
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>BunnyUp</Text>
+          {/* logo */}
+          <View>
+            <Image
+              source={require("@/assets/images/logo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
           <View style={styles.icons}>
             <Pressable
               onPress={() => {
@@ -318,6 +332,10 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: heightPercentage(3.2),
     fontWeight: theme.fonts.bold,
+  },
+  logo: {
+    height: heightPercentage(5),
+    width: heightPercentage(14),
   },
   avatarImage: {
     height: heightPercentage(4.3),
