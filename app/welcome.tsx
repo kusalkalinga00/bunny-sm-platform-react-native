@@ -16,7 +16,7 @@ const welcome = () => {
       <StatusBar style="dark" />
       <View style={styles.container}>
         <View style={{ gap: 20 }}>
-          <Text style={styles.title}>BunnyUp!</Text>
+          <Text style={styles.title}>Bunny Up!</Text>
           <Text style={styles.punchline}>
             Discover freedom and flexibility with our app, designed to make your
             life easier.
